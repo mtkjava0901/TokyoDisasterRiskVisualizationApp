@@ -78,7 +78,7 @@ public class EarthquakeService {
 		return dto;
 	}
 
-	// 地震レイヤーの取得
+	// 地震レイヤーAPI取得
 	public List<EarthquakeLayerDto> getLayer(
 			double minLat,
 			double maxLat,

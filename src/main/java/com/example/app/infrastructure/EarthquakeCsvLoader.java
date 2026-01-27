@@ -20,13 +20,13 @@ public class EarthquakeCsvLoader {
 
 	// CSVを読んでDTOのListを返す
 	public List<EarthquakeRawDto> load() {
-		List<EarthquakeRawDto> result = new ArrayList<>();
+		List<EarthquakeRawDto> list = new ArrayList<>();
 
 		// try&catch 失敗したらRuntimeException
 		try (
 
 				// 1行ずつreadLine()で読めるようにする
-				BufferedReader reader = new BufferedReader(
+				BufferedReader br = new BufferedReader(
 
 						// バイト⇒文字に変換
 						new InputStreamReader(
@@ -39,7 +39,7 @@ public class EarthquakeCsvLoader {
 			boolean isHeader = true;
 
 			// CSVの終わりまで繰り返すループ構文
-			while ((line = reader.readLine()) != null) {
+			while ((line = br.readLine()) != null) {
 
 				// ヘッダ行スキップ
 				if (isHeader) {
@@ -48,16 +48,16 @@ public class EarthquakeCsvLoader {
 				}
 
 				// カンマ区切りで分割
-				String[] columns = line.split("");
+				String[] values = line.split(",");
 
 				// このクラスの核心部分
 				// CSV文字列⇒Java型に変換する
 				EarthquakeRawDto dto = new EarthquakeRawDto();
-				dto.setMeshCode(columns[0]);
-				dto.setIntensity(Double.parseDouble(columns[1]));
+				dto.setMeshCode(values[0]);
+				dto.setIntensity(Double.parseDouble(values[1]));
 
 				// リストに追加
-				result.add(dto);
+				list.add(dto);
 			}
 
 			// 例外処理
@@ -65,7 +65,7 @@ public class EarthquakeCsvLoader {
 			throw new RuntimeException("地震CSVの読み込みに失敗しました", e);
 		}
 
-		return result;
+		return list;
 	}
 
 }
