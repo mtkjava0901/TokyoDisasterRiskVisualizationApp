@@ -9,6 +9,7 @@ import com.example.app.domain.EarthquakeMesh;
 import com.example.app.domain.RiskLevel;
 import com.example.app.dto.layer.EarthquakeLayerDto;
 import com.example.app.dto.raw.EarthquakeRawDto;
+import com.example.app.infrastructure.EarthquakeCsvLoader;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,9 +17,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class EarthquakeService {
 
+	private final EarthquakeCsvLoader csvLoader;
+
 	/************************
 	 * 
 	 * RawDto ⇒ Mesh
+	 * (public)
 	 *  
 	************************/
 
@@ -57,11 +61,12 @@ public class EarthquakeService {
 	/************************
 	 * 
 	 * Mesh ⇒ LayerDto
+	 * (private)
 	 *  
 	************************/
 
 	// リスト変換
-	public List<EarthquakeLayerDto> toLayerDtos(List<EarthquakeMesh> meshes) {
+	private List<EarthquakeLayerDto> toLayerDtos(List<EarthquakeMesh> meshes) {
 		// List<EarthquakeLayerDto>をStreamに変換(1件ずつ処理可能にする)
 		return meshes.stream()
 				.map(this::toLayerDto)
@@ -78,15 +83,24 @@ public class EarthquakeService {
 		return dto;
 	}
 
-	// 地震レイヤーの取得
-	public List<EarthquakeLayerDto> getLayer(
-			double minLat,
-			double maxLat,
-			double minLng,
-			double maxLng,
-			int zoom) {
-		// TODO: 後で実装
-		return List.of();
+	/************************
+	 * 
+	 * Mesh ⇒ LayerDto
+	 * (public)
+	 *  
+	************************/
+
+	// 地震レイヤーAPI取得
+	public List<EarthquakeLayerDto> getLayer() {
+
+		// ①CSV読み込み
+		List<EarthquakeRawDto> raws = csvLoader.load();
+
+		// ②Raw⇒Mesh(リスクの分類)
+		List<EarthquakeMesh> meshes = convertList(raws);
+
+		// ③Mesh⇒API用DTO
+		return toLayerDtos(meshes);
 	}
 
 }

@@ -19,7 +19,7 @@ public class EarthquakeController {
 
 	private final EarthquakeService earthquakeService;
 
-	// 地震レイヤー取得API(A-01)
+	// 地震レイヤーAPI取得(A-01)
 	@GetMapping("/layer")
 	public List<EarthquakeLayerDto> getEarthquakeLayer(
 			@RequestParam double minLat,
@@ -27,7 +27,7 @@ public class EarthquakeController {
 			@RequestParam double minLng,
 			@RequestParam double maxLng,
 			@RequestParam int zoom) {
-		return earthquakeService.getLayer(minLat, maxLat, minLng, maxLng, zoom);
+		return earthquakeService.getLayer();
 	}
 
 }
