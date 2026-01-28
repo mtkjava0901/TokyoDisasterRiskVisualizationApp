@@ -27,7 +27,7 @@ public class EarthquakeController {
 			@RequestParam double minLng,
 			@RequestParam double maxLng,
 			@RequestParam int zoom) {
-		return earthquakeService.getLayer(minLat, maxLat, minLng, maxLng, zoom);
+		return earthquakeService.getLayer();
 	}
 
 }
