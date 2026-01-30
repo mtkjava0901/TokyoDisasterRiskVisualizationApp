@@ -3,7 +3,7 @@ package com.example.app.dto.layer;
 import lombok.Data;
 
 // APIレスポンス用DTO
-// 内部処理用DTOのデータを整形し、MAP描画できる形にする
+// 内部処理用DTOのデータを整形し、DTOをそのままどう描くかを決める
 
 @Data
 public class EarthquakeLayerDto {
