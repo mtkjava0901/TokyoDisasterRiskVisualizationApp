@@ -1,11 +1,13 @@
 package com.example.app.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.example.app.domain.EarthquakeMesh;
+import com.example.app.domain.MeshLevel;
 import com.example.app.domain.RiskLevel;
 import com.example.app.dto.layer.EarthquakeLayerDto;
 import com.example.app.dto.raw.EarthquakeRawDto;
@@ -18,6 +20,8 @@ import lombok.RequiredArgsConstructor;
 public class EarthquakeService {
 
 	private final EarthquakeCsvLoader csvLoader;
+	private final MeshPolygonFactory meshPolygonFactory;
+	private final EarthquakeLayerFactory layerFactory;
 
 	/************************
 	 * 
@@ -79,6 +83,7 @@ public class EarthquakeService {
 		EarthquakeLayerDto dto = new EarthquakeLayerDto();
 		dto.setMeshCode(mesh.getMeshCode());
 		dto.setRiskLevel(mesh.getRiskLevel().name());
+		dto.setPolygon(meshPolygonFactory.create(mesh.getMeshCode()));
 
 		return dto;
 	}
@@ -91,16 +96,45 @@ public class EarthquakeService {
 	************************/
 
 	// 地震レイヤーAPI取得
-	public List<EarthquakeLayerDto> getLayer() {
+	public List<EarthquakeLayerDto> getLayer(
+			double minLat,
+			double maxLat,
+			double minLng,
+			double maxLng,
+			MeshLevel meshLevel) {
 
 		// ①CSV読み込み
 		List<EarthquakeRawDto> raws = csvLoader.load();
 
 		// ②Raw⇒Mesh(リスクの分類)
-		List<EarthquakeMesh> meshes = convertList(raws);
+		Map<String, EarthquakeMesh> meshMap = raws.stream()
+				.map(this::convert)
+				// ｢以上｣で通す
+				.filter(m -> m.getMeshCode().length() >= meshLevel.getCodeLength())
+				// 上位メッシュに丸める
+				.map(m -> {
+					m.setMeshCode(
+							m.getMeshCode().substring(0, meshLevel.getCodeLength()));
+					return m;
+				})
+				// meshCode単位で集約
+				.collect(Collectors.toMap(
+						EarthquakeMesh::getMeshCode,
+						m -> m,
+						// 同一メッシュは｢震度が大きい方｣を残す
+						(a, b) -> a.getIntensity() >= b.getIntensity() ? a : b));
 
-		// ③Mesh⇒API用DTO
-		return toLayerDtos(meshes);
+		List<EarthquakeMesh> meshes = List.copyOf(meshMap.values());
+
+		// デバッグ用
+		System.out.println(
+				"[Service] meshes after filter size=" + meshes.size());
+
+		// ③Mesh⇒LayerDto(Polygon生成)
+		return meshes.stream()
+				.map(layerFactory::create)
+				.toList();
+
 	}
 
 }
