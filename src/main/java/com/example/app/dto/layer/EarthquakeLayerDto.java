@@ -2,6 +2,7 @@ package com.example.app.dto.layer;
 
 import java.util.List;
 
+import com.example.app.domain.RiskLevel;
 import com.example.app.dto.polygon.LatLngDto;
 
 import lombok.Data;
@@ -14,7 +15,11 @@ public class EarthquakeLayerDto {
 	
 	private String meshCode;
 	
-	private String riskLevel; // フロント用文字列
+	// 計測震度
+	private double intensity;
+	
+	// ENUM : RiskLevel
+	private RiskLevel riskLevel;
 	
 	// GoogleMap Polygon用
 	private List<LatLngDto> polygon;

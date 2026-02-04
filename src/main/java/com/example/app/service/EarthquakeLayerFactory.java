@@ -17,7 +17,7 @@ public class EarthquakeLayerFactory {
 	public EarthquakeLayerDto create(EarthquakeMesh mesh) {
 		EarthquakeLayerDto dto = new EarthquakeLayerDto();
 		dto.setMeshCode(mesh.getMeshCode());
-		dto.setRiskLevel(mesh.getRiskLevel().name());
+		dto.setRiskLevel(mesh.getRiskLevel());
 		dto.setPolygon(meshPolygonFactory.create(mesh.getMeshCode()));
 		return dto;
 	}

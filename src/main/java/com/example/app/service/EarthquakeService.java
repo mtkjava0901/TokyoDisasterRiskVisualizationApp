@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.app.domain.EarthquakeMesh;
 import com.example.app.domain.MeshLevel;
+import com.example.app.domain.QuantileCalculator;
 import com.example.app.domain.RiskLevel;
 import com.example.app.dto.layer.EarthquakeLayerDto;
 import com.example.app.dto.raw.EarthquakeRawDto;
@@ -36,8 +37,6 @@ public class EarthquakeService {
 		// 値のコピー
 		mesh.setMeshCode(raw.getMeshCode());
 		mesh.setIntensity(raw.getIntensity());
-		// リスク分類
-		mesh.setRiskLevel(classifyRisk(raw.getIntensity()));
 		return mesh;
 	}
 
@@ -46,20 +45,6 @@ public class EarthquakeService {
 		return raws.stream()
 				.map(this::convert)
 				.collect(Collectors.toList());
-	}
-
-	// リスク分類メソッド
-	public RiskLevel classifyRisk(double intensity) {
-		// 計測震度4.7以上：HIGH
-		if (intensity >= 4.7) {
-			return RiskLevel.HIGH;
-		}
-		// 計測震度4.6以上：MEDIUM
-		if (intensity >= 4.6) {
-			return RiskLevel.MEDIUM;
-		}
-		// 計測震度上記未満：LOW
-		return RiskLevel.LOW;
 	}
 
 	/************************
@@ -77,12 +62,38 @@ public class EarthquakeService {
 				.toList();
 	}
 
+	// 分位点ロジック
+	private void applyQuantileRisk(List<EarthquakeMesh> meshes) {
+		if (meshes.isEmpty())
+			return;
+
+		List<Double> intensities = meshes.stream()
+				.map(EarthquakeMesh::getIntensity)
+				.sorted()
+				.toList();
+
+		double q33 = QuantileCalculator.percentile(intensities, 0.33);
+		double q66 = QuantileCalculator.percentile(intensities, 0.66);
+
+		for (EarthquakeMesh mesh : meshes) {
+			double intensity = mesh.getIntensity();
+
+			if (intensity >= q66) {
+				mesh.setRiskLevel(RiskLevel.HIGH);
+			} else if (intensity >= q33) {
+				mesh.setRiskLevel(RiskLevel.MEDIUM);
+			} else {
+				mesh.setRiskLevel(RiskLevel.LOW);
+			}
+		}
+	}
+
 	// Service内部用変換ルール（外部利用しないのでprivate）
 	private EarthquakeLayerDto toLayerDto(EarthquakeMesh mesh) {
 		// API返却用DTOを新規作成
 		EarthquakeLayerDto dto = new EarthquakeLayerDto();
 		dto.setMeshCode(mesh.getMeshCode());
-		dto.setRiskLevel(mesh.getRiskLevel().name());
+		dto.setRiskLevel(mesh.getRiskLevel());
 		dto.setPolygon(meshPolygonFactory.create(mesh.getMeshCode()));
 
 		return dto;
@@ -103,10 +114,10 @@ public class EarthquakeService {
 			double maxLng,
 			MeshLevel meshLevel) {
 
-		// ①CSV読み込み
+		// 1.CSV読み込み
 		List<EarthquakeRawDto> raws = csvLoader.load();
 
-		// ②Raw⇒Mesh(リスクの分類)
+		// 2.Raw ⇒ Mesh ⇒ メッシュ単位で集約
 		Map<String, EarthquakeMesh> meshMap = raws.stream()
 				.map(this::convert)
 				// ｢以上｣で通す
@@ -126,11 +137,10 @@ public class EarthquakeService {
 
 		List<EarthquakeMesh> meshes = List.copyOf(meshMap.values());
 
-		// デバッグ用
-		System.out.println(
-				"[Service] meshes after filter size=" + meshes.size());
+		// 3.分位点の計算
+		applyQuantileRisk(meshes);
 
-		// ③Mesh⇒LayerDto(Polygon生成)
+		// 4.Mesh⇒LayerDto(Polygon生成)
 		return meshes.stream()
 				.map(layerFactory::create)
 				.toList();
