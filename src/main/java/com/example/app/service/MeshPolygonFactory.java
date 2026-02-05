@@ -75,7 +75,7 @@ public class MeshPolygonFactory {
 
 	/*************************************
 	 * meshCode ： 
-	 * create ⇒ createTertiary(2次メッシュ) 
+	 * create ⇒ createTertiary(3次メッシュ) 
 	 * 2次メッシュを10×10に分割
 	 ************************************/
 	private List<LatLngDto> createTertiary(String meshCode) {
