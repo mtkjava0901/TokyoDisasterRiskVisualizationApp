@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import com.example.app.dto.raw.EarthquakeRawDto;
 
 // CSVファイル読み込み⇒リスト形式で返す
+// infrastructure ⇒ 基盤・設備等
 
 @Component
 public class EarthquakeCsvLoader {
