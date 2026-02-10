@@ -10,8 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
-import com.example.app.domain.GeoPoint;
 import com.example.app.domain.PointInPolygon;
+import com.example.app.domain.area.GeoPoint;
 
 @Component
 public class TokyoPolygonRepository {

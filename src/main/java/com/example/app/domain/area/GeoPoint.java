@@ -1,4 +1,4 @@
-package com.example.app.domain;
+package com.example.app.domain.area;
 
 // lat / lngを明示的に分ける
 // x= lng(経度), y= lat(緯度)として扱う

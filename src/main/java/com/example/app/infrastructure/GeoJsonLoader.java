@@ -4,7 +4,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.app.domain.GeoPoint;
+import com.example.app.domain.area.GeoPoint;
 
 import lombok.extern.slf4j.Slf4j;
 import tools.jackson.databind.JsonNode;

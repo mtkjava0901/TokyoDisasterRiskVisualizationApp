@@ -2,6 +2,8 @@ package com.example.app.domain;
 
 import java.util.List;
 
+import com.example.app.domain.area.GeoPoint;
+
 public final class PointInPolygon {
 
 	/*****************************
