@@ -30,52 +30,62 @@ public class TokyoBoundaryRepository {
 
 	public synchronized TokyoBoundary load() {
 		if (cached == null) {
-			List<GeoPoint> points = loadFromGeoJson();
 
-			if (points == null || points.isEmpty()) {
-				throw new IllegalStateException("Tokyo boundary points are empty");
+			List<List<GeoPoint>> polygons = loadFromGeoJson();
+
+			if (polygons == null || polygons.isEmpty()) {
+				throw new IllegalStateException("Tokyo boundary polygons are empty");
 			}
-			cached = new TokyoBoundary(points);
+
+			cached = new TokyoBoundary(polygons);
 		}
 		return cached;
 	}
 
-	private List<GeoPoint> loadFromGeoJson() {
+	private List<List<GeoPoint>> loadFromGeoJson() {
 
 		try (InputStream is = new ClassPathResource(
 				"static/geo/tokyo_mainland.geojson").getInputStream()) {
 
 			JsonNode root = mapper.readTree(is);
-
 			JsonNode features = root.path("features");
+
 			if (!features.isArray() || features.isEmpty()) {
 				throw new IllegalStateException("GeoJSON features not found");
 			}
 
-			// 本土データのみ → 最初の Polygon を使う
-			JsonNode geometry = features.get(0).path("geometry");
+			List<List<GeoPoint>> polygons = new ArrayList<>();
 
-			if (!"Polygon".equals(geometry.path("type").asText())) {
-				throw new IllegalStateException("Geometry is not Polygon");
+			for (JsonNode feature : features) {
+
+				// 本土データのみ → 最初の Polygon を使う
+				JsonNode geometry = feature.path("geometry");
+
+				if (!"Polygon".equals(geometry.path("type").asText())) {
+					// 無効なfeatureは無視して次へ
+					continue;
+				}
+
+				JsonNode outerRing = geometry
+						.path("coordinates")
+						.path(0);
+
+				if (!outerRing.isArray() || outerRing.isEmpty()) {
+					// 無効なfeatureは無視して次へ
+					continue;
+				}
+
+				List<GeoPoint> polygon = new ArrayList<>();
+
+				for (JsonNode coord : outerRing) {
+					double lng = coord.get(0).asDouble();
+					double lat = coord.get(1).asDouble();
+					polygon.add(new GeoPoint(lat, lng));
+				}
+				polygons.add(polygon);
 			}
 
-			// coordinates[0] = outer ring
-			JsonNode outerRing = geometry
-					.path("coordinates")
-					.path(0);
-
-			if (!outerRing.isArray() || outerRing.isEmpty()) {
-				throw new IllegalStateException("Outer ring not found");
-			}
-
-			List<GeoPoint> points = new ArrayList<>();
-			for (JsonNode coord : outerRing) {
-				double lng = coord.get(0).asDouble();
-				double lat = coord.get(1).asDouble();
-				points.add(new GeoPoint(lat, lng));
-			}
-
-			return points;
+			return polygons;
 
 		} catch (Exception e) {
 			throw new IllegalStateException("Failed to load Tokyo boundary GeoJSON", e);
