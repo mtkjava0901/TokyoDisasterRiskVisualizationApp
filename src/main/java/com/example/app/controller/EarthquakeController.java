@@ -33,16 +33,21 @@ public class EarthquakeController {
 			@RequestParam double minLng,
 			@RequestParam double maxLng,
 			@RequestParam int meshLevel) {
-		return earthquakeService.getLayer(minLat, maxLat, minLng, maxLng, MeshLevel.fromCodeLength(meshLevel));
+		return earthquakeService
+				.getLayer(minLat, maxLat, minLng, maxLng,
+						MeshLevel.fromCodeLength(meshLevel));
 	}
 
 	// A-03 地震リスク(1点)判定API取得
 	@GetMapping("/risk")
 	public Map<String, String> getRiskLevel(
 			@RequestParam double lat,
-			@RequestParam double lng) {
+			@RequestParam double lng,
+			@RequestParam int meshLevel) {
 
-		RiskLevel level = earthquakeRiskService.getRiskLevel(new GeoPoint(lat, lng));
+		RiskLevel level = earthquakeRiskService
+				.getRiskLevel(new GeoPoint(lat, lng),
+						MeshLevel.fromCodeLength(meshLevel));
 
 		return Map.of("riskLevel", level.name());
 	}
