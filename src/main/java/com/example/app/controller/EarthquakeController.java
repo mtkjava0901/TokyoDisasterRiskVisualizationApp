@@ -42,12 +42,12 @@ public class EarthquakeController {
 	@GetMapping("/risk")
 	public Map<String, String> getRiskLevel(
 			@RequestParam double lat,
-			@RequestParam double lng,
-			@RequestParam int meshLevel) {
+			@RequestParam double lng) {
 
 		RiskLevel level = earthquakeRiskService
 				.getRiskLevel(new GeoPoint(lat, lng),
-						MeshLevel.fromCodeLength(meshLevel));
+						// 常に3次メッシュ
+						MeshLevel.TERTIARY);
 
 		return Map.of("riskLevel", level.name());
 	}

@@ -1,21 +1,14 @@
-package com.example.app.config;
-
-import java.util.List;
-
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
-import com.example.app.domain.RiskArea;
-import com.example.app.service.EarthquakeService;
-
-import lombok.RequiredArgsConstructor;
+// package com.example.app.config;
 
 /**********************************
  * 
  * 地震リスクデータ供給用コンフィグ
  * 
+ * ※一旦無使用予定
+ * 
  *********************************/
 
+/*
 @Configuration
 @RequiredArgsConstructor
 public class EarthquakeRiskDataConfig {
@@ -35,17 +28,18 @@ public class EarthquakeRiskDataConfig {
 
 		System.out.println("Config: 地震リスクデータをロードしました。件数: " + masterData.size());
 		return masterData;
+*/
 
-		// 2.RawデータをRiskArea(内部ドメイン)に変換
-		//		return rawData.stream()
-		//				.map(raw -> {
-		//					// ここでメッシュコードからポリゴンを作成
-		//					List<GeoPoint> polygon = convertMeshToPolygon(raw.getMeshCode());
-		//					// ここで震度からRiskLevelを判定
-		//					RiskLevel level = calculateRiskLevel(raw.getIntensity());
-		//
-		//					return new RiskArea(polygon, level);
-		//				})
-		//				.collect(Collectors.toList());
-	}
-}
+// 2.RawデータをRiskArea(内部ドメイン)に変換
+//		return rawData.stream()
+//				.map(raw -> {
+//					// ここでメッシュコードからポリゴンを作成
+//					List<GeoPoint> polygon = convertMeshToPolygon(raw.getMeshCode());
+//					// ここで震度からRiskLevelを判定
+//					RiskLevel level = calculateRiskLevel(raw.getIntensity());
+//
+//					return new RiskArea(polygon, level);
+//				})
+//				.collect(Collectors.toList());
+//}
+//}
