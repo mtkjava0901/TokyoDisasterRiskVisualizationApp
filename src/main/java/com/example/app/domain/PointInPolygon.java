@@ -2,6 +2,8 @@ package com.example.app.domain;
 
 import java.util.List;
 
+import com.example.app.domain.area.GeoPoint;
+
 public final class PointInPolygon {
 
 	/*****************************
@@ -22,9 +24,6 @@ public final class PointInPolygon {
 	public static boolean contains(List<GeoPoint> polygon, GeoPoint point) {
 
 		boolean inside = false;
-		// double x = point.lng();
-		// double y = point.lat();
-
 		int n = polygon.size();
 
 		// i = 現在の頂点, j = 1つ前の頂点
