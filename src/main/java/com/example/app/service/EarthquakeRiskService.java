@@ -47,4 +47,37 @@ public class EarthquakeRiskService {
 		return result;
 	}
 
+	// 該当RiskAreaを返すメソッド(2/19追加)
+	public RiskArea findRiskArea(GeoPoint point, MeshLevel meshLevel) {
+
+		// meshLevelに応じたRiskArea生成
+		List<RiskArea> riskAreas = earthquakeService.getRiskAreasByMeshLevel(meshLevel);
+
+		RiskArea selected = null;
+
+		for (RiskArea area : riskAreas) {
+			if (!area.contains(point))
+				continue;
+
+			// HIGHが最優先
+			if (area.getRiskLevel() == RiskLevel.HIGH) {
+				return area;
+			}
+
+			// MEDIUMは候補保持
+			if (area.getRiskLevel() == RiskLevel.MEDIUM) {
+				selected = area;
+				// 2/19追記
+				continue;
+			}
+
+			// LOWは最後の候補
+			if (selected == null) {
+				selected = area;
+			}
+		}
+
+		return selected;
+	}
+
 }

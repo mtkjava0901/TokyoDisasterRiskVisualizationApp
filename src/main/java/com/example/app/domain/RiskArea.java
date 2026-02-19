@@ -14,21 +14,27 @@ public class RiskArea {
 
 	private final List<GeoPoint> polygon; // ポリゴン座標
 	private final RiskLevel riskLevel; // HIGH/MEDIUM/LOW
+	private final Double intensity; // 震度
 
 	/****************************************
 	 * コンストラクタ
 	 * @param polygon ポリゴン座標リスト
 	 * @param riskLevel リスクレベル
 	 ***************************************/
-	public RiskArea(List<GeoPoint> polygon, RiskLevel riskLevel) {
+	public RiskArea(
+			List<GeoPoint> polygon,
+			RiskLevel riskLevel,
+			Double intensity) {
 		if (polygon == null || polygon.size() < 3) {
 			throw new IllegalArgumentException("ポリゴンは3点以上必要です");
 		}
 		if (riskLevel == null) {
 			throw new IllegalArgumentException("riskLevelは必須です");
 		}
+
 		this.polygon = polygon;
 		this.riskLevel = riskLevel;
+		this.intensity = intensity;
 	}
 
 	public List<GeoPoint> getPolygon() {
@@ -37,6 +43,10 @@ public class RiskArea {
 
 	public RiskLevel getRiskLevel() {
 		return riskLevel;
+	}
+
+	public Double getIntensity() {
+		return intensity;
 	}
 
 	/**********************************************
@@ -52,8 +62,8 @@ public class RiskArea {
 	public String toString() {
 		return "RiskArea{" +
 				"riskLevel=" + riskLevel +
+				", intensity=" + intensity +
 				", polygonPoints=" + polygon.size() +
 				'}';
 	}
-
 }

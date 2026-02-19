@@ -192,7 +192,11 @@ public class EarthquakeService {
 								.map(dto -> new GeoPoint(dto.getLat(), dto.getLng()))
 								.toList();
 
-						return new RiskArea(geoPoints, m.getRiskLevel());
+						return new RiskArea(
+								geoPoints,
+								m.getRiskLevel(),
+								m.getIntensity());
+
 					} catch (UnsupportedMeshCodeException e) {
 						// もし切り詰めてもなお不正な桁数（例：3桁など）の場合はスキップ
 						return null;
@@ -238,7 +242,10 @@ public class EarthquakeService {
 							.map(dto -> new GeoPoint(dto.getLat(), dto.getLng()))
 							.toList();
 
-					return new RiskArea(geoPoints, m.getRiskLevel());
+					return new RiskArea(
+							geoPoints,
+							m.getRiskLevel(),
+							m.getIntensity());
 				})
 				.toList();
 	}
