@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.app.domain.FloodArea;
+import com.example.app.domain.FloodMesh;
 import com.example.app.domain.area.GeoPoint;
 import com.example.app.dto.layer.FloodLayerDto;
 import com.example.app.service.FloodService;
@@ -41,10 +42,13 @@ public class FloodController {
 	public Map<String, Object> getFloodRisk(
 			@RequestParam double lat,
 			@RequestParam double lng) {
+
 		GeoPoint point = new GeoPoint(lat, lng);
-		FloodArea area = floodService.findFloodArea(point);
+
+		FloodMesh mesh = floodService.findFloodArea(point);
+
 		// 該当エリアが存在しない場合
-		if (area == null) {
+		if (mesh == null) {
 			Map<String, Object> result = new HashMap<>();
 			result.put("riskLevel", "UNKNOWN");
 			result.put("rank", null);
@@ -52,12 +56,13 @@ public class FloodController {
 			result.put("dataUpdatedAt", DATA_UPDATED_AT);
 			return result;
 		}
+
 		// 正常レスポンス
 		return Map.of(
-				"riskLevel", area.getRiskLevel().name(),
-				"rank", area.getRank(),
+				"riskLevel", mesh.getRiskLevel().name(),
+				"rank", mesh.getMaxRank(),
 				"depthDescription",
-				FloodArea.getDepthDescription(area.getRank()),
+				FloodArea.getDepthDescription(mesh.getMaxRank()),
 				"dataUpdatedAt", DATA_UPDATED_AT);
 	}
 
