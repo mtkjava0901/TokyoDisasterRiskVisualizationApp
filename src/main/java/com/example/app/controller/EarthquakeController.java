@@ -24,7 +24,7 @@ public class EarthquakeController {
 	private final EarthquakeRiskService earthquakeRiskService;
 
 	// データ更新年月(CSV更新時に変更)
-	private static final String DATA_UPDATED_AT = "2024年6月18日";
+	private static final String DATA_UPDATED_AT = "2024年6月";
 
 	// A-01 地震レイヤーAPI取得
 	@GetMapping("/layer")
@@ -39,21 +39,6 @@ public class EarthquakeController {
 				minLat, maxLat, minLng, maxLng,
 				MeshLevel.fromCodeLength(meshLevel));
 	}
-
-	/*
-	 * 2/18backup
-	@GetMapping("/layer")
-	public List<EarthquakeLayerDto> getEarthquakeLayer(
-			@RequestParam double minLat,
-			@RequestParam double maxLat,
-			@RequestParam double minLng,
-			@RequestParam double maxLng,
-			@RequestParam int meshLevel) {
-		return earthquakeService
-				.getLayer(minLat, maxLat, minLng, maxLng,
-						MeshLevel.fromCodeLength(meshLevel));
-	}
-	*/
 
 	// A-03 地震リスク(1点)判定API取得
 	@GetMapping("/risk")
@@ -84,20 +69,5 @@ public class EarthquakeController {
 				"intensity", area.getIntensity(),
 				"dataUpdatedAt", DATA_UPDATED_AT);
 	}
-
-	/*
-	 * 2/18backup
-	public Map<String, String> getRiskLevel(
-			@RequestParam double lat,
-			@RequestParam double lng) {
-	
-		RiskLevel level = earthquakeRiskService
-				.getRiskLevel(new GeoPoint(lat, lng),
-						// 常に3次メッシュ
-						MeshLevel.TERTIARY);
-	
-		return Map.of("riskLevel", level.name());
-	}
-	*/
 
 }
