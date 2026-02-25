@@ -40,11 +40,4 @@ public class TokyoAreaController {
 		return new TokyoAreaResponse(isTokyo, nearest);
 	}
 
-	// Controllerの戻り値を明示的にする（必要？）
-	//	public record TokyoContainsResponse(boolean isTokyo) {
-	//		public static TokyoContainsResponse of(boolean isTokyo) {
-	//			return new TokyoContainsResponse(isTokyo);
-	//		}
-	//	}
-
 }
