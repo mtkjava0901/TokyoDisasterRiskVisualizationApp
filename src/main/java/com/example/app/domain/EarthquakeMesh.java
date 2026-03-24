@@ -15,4 +15,6 @@ public class EarthquakeMesh {
 
 	private RiskLevel riskLevel; // 仮ENUM
 
+	private MeshBounds bounds; // BBox用
+
 }
